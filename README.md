@@ -1,6 +1,6 @@
 # Bilalabic.github.io
 
-A lightweight GitHub hub that automatically lists public repositories and GitHub Pages projects for Bilalabic.
+An editorial-style project showcase that automatically lists public repositories and live GitHub Pages projects for Bilalabic.
 
 https://bilalabic.github.io/
 
@@ -8,9 +8,9 @@ https://bilalabic.github.io/
 
 - Loads GitHub profile data for Bilalabic
 - Lists public repositories directly from the GitHub REST API
-- Detects GitHub Pages projects automatically using `has_pages`
-- Shows dedicated **Live Sites** and **Repositories** sections
-- Supports client-side search and simple repository filters
+- Detects live projects automatically using `repo.has_pages === true`
+- Shows dedicated **Live Projects** and **All Projects** sections
+- Supports client-side search and lightweight repository filters
 - Uses resilient local cache with stale fallback
 - Works with system light/dark mode and responsive layouts
 
