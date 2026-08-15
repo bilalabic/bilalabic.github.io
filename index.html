@@ -1,44 +1,81 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Nothing here yet :(</title>
-<style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            background-color: #fff;
-            -webkit-text-size-adjust: 100%;
-            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                color: #fff;
-                background-color: #212529;
-            }
-        }
-
-        p {
-            margin: 2rem;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bilalabic — Projects & Live Sites</title>
+  <meta name="description" content="Open-source projects and live GitHub Pages sites by Bilalabic.">
+  <link rel="canonical" href="https://bilalabic.github.io/">
+  <meta property="og:title" content="Bilalabic — Projects & Live Sites">
+  <meta property="og:description" content="Open-source projects and live GitHub Pages sites by Bilalabic.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bilalabic.github.io/">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
-<p>
-Sorry, but I didn't had any time to write something here yet. 😕
-</p>
+  <header class="site-header">
+    <div class="container">
+      <section class="profile" aria-labelledby="profile-heading">
+        <img id="profileAvatar" class="profile-avatar" src="" alt="Bilalabic profile avatar" width="88" height="88">
+        <div class="profile-content">
+          <h1 id="profileName" class="profile-name" aria-live="polite">Bilalabic</h1>
+          <p id="profileHandle" class="profile-handle">@Bilalabic</p>
+          <p id="profileBio" class="profile-bio">Open-source projects and live GitHub Pages sites.</p>
+          <div class="profile-meta">
+            <span id="profileRepoCount">0 public repositories</span>
+            <a id="profileLink" href="https://github.com/Bilalabic" target="_blank" rel="noopener noreferrer">GitHub Profile ↗</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div id="statusRegion" class="status" role="status" aria-live="polite"></div>
+
+      <section class="section" aria-labelledby="live-sites-heading">
+        <div class="section-head">
+          <h2 id="live-sites-heading">Live Sites</h2>
+          <p>Projects currently published with GitHub Pages.</p>
+        </div>
+        <div id="liveSitesGrid" class="card-grid" aria-live="polite"></div>
+        <p id="liveSitesEmpty" class="empty-state" hidden>No live GitHub Pages projects are currently available.</p>
+      </section>
+
+      <section class="section" aria-labelledby="repositories-heading">
+        <div class="section-head">
+          <h2 id="repositories-heading">Repositories</h2>
+          <p>Public repositories on GitHub.</p>
+        </div>
+
+        <div class="controls">
+          <label for="repositorySearch" class="search-label">Search repositories...</label>
+          <input id="repositorySearch" type="search" class="search-input" autocomplete="off" placeholder="Search repositories...">
+          <nav class="filters" aria-label="Repository filters">
+            <button type="button" class="filter-button is-active" data-filter="all">All</button>
+            <button type="button" class="filter-button" data-filter="live">Live</button>
+            <button type="button" class="filter-button" data-filter="original">Original</button>
+            <button type="button" class="filter-button" data-filter="forks">Forks</button>
+            <button type="button" class="filter-button" data-filter="archived">Archived</button>
+          </nav>
+        </div>
+
+        <div id="repositoriesGrid" class="card-grid" aria-live="polite"></div>
+        <p id="repositoriesEmpty" class="empty-state" hidden>No repositories match your search.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>GitHub projects by Bilalabic</p>
+      <div class="footer-links">
+        <a href="https://github.com/Bilalabic" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a href="https://github.com/Bilalabic/bilalabic.github.io" target="_blank" rel="noopener noreferrer">View source ↗</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
