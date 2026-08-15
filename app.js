@@ -5,23 +5,19 @@ const CONFIG = {
   excludedRepositories: [],
   includeForks: true,
   showArchivedRepositories: true,
-  maxTopicsPerCard: 3,
   cacheDuration: 30 * 60 * 1000
 };
 
 const STORAGE_KEY = "bilalabic-github-hub-cache";
 
 const dom = {
-  profileAvatar: document.getElementById("profileAvatar"),
   profileName: document.getElementById("profileName"),
-  profileHandle: document.getElementById("profileHandle"),
   profileBio: document.getElementById("profileBio"),
-  profileRepoCount: document.getElementById("profileRepoCount"),
   profileLink: document.getElementById("profileLink"),
-  liveSitesGrid: document.getElementById("liveSitesGrid"),
-  liveSitesEmpty: document.getElementById("liveSitesEmpty"),
-  repositoriesGrid: document.getElementById("repositoriesGrid"),
-  repositoriesEmpty: document.getElementById("repositoriesEmpty"),
+  liveProjectsList: document.getElementById("liveProjectsList"),
+  liveProjectsEmpty: document.getElementById("liveProjectsEmpty"),
+  projectsList: document.getElementById("projectsList"),
+  projectsEmpty: document.getElementById("projectsEmpty"),
   repositorySearch: document.getElementById("repositorySearch"),
   filterButtons: Array.from(document.querySelectorAll(".filter-button")),
   statusRegion: document.getElementById("statusRegion")
@@ -171,17 +167,13 @@ async function fetchAllRepositories() {
   return repositories;
 }
 
-function formatDate(dateValue) {
+function formatYear(dateValue) {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) {
-    return "Updated unknown";
+    return "—";
   }
 
-  return `Updated ${new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  }).format(date)}`;
+  return String(date.getFullYear());
 }
 
 function getFilteredRepositories(repositories) {
@@ -214,125 +206,145 @@ function sortRepositories(repositories) {
   });
 }
 
-function createBadge(text, className = "") {
-  const badge = document.createElement("span");
-  badge.className = className ? `badge ${className}` : "badge";
-  badge.textContent = text;
-  return badge;
-}
-
-function createExternalLink(href, text, primary = false) {
+function createExternalLink(href, text, className = "") {
   const link = document.createElement("a");
-  link.className = primary ? "link-button primary" : "link-button";
   link.href = href;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
+  if (className) {
+    link.className = className;
+  }
   link.textContent = text;
   return link;
 }
 
-function createRepositoryCard(repo, options = { includeSiteLink: false }) {
-  const card = document.createElement("article");
-  card.className = "card";
+function getRepositoryLanguage(repo) {
+  return repo?.language || null;
+}
 
-  const titleWrap = document.createElement("div");
-  titleWrap.className = "card-title-wrap";
+function getLiveProjectMetadata(repo) {
+  const tags = [];
+  const language = getRepositoryLanguage(repo);
+  if (language) {
+    tags.push(language);
+  }
+  tags.push("Live");
+  if (repo?.archived) {
+    tags.push("Archived");
+  }
+  if (repo?.fork) {
+    tags.push("Fork");
+  }
+  return tags.join(" · ");
+}
+
+function createLiveProjectEntry(repo, index) {
+  const item = document.createElement("article");
+  item.className = "live-item";
+
+  const number = document.createElement("p");
+  number.className = "live-index";
+  number.textContent = String(index + 1).padStart(2, "0");
+  item.appendChild(number);
+
+  const main = document.createElement("div");
+  main.className = "live-main";
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "live-title-row";
 
   const title = document.createElement("h3");
-  title.className = "card-title";
-  title.textContent = repo.name || "Unnamed repository";
-  titleWrap.appendChild(title);
+  title.className = "live-title";
+  title.textContent = repo?.name || "Unnamed project";
+  titleRow.appendChild(title);
 
-  const badges = document.createElement("div");
-  badges.className = "badges";
-  if (repo.fork) {
-    badges.appendChild(createBadge("Fork"));
-  }
-  if (repo.archived) {
-    badges.appendChild(createBadge("Archived", "archived"));
-  }
-  titleWrap.appendChild(badges);
-  card.appendChild(titleWrap);
+  const projectUrl = `${CONFIG.githubPagesOrigin}/${encodeURIComponent(repo.name)}/`;
+  const visitLink = createExternalLink(projectUrl, "Visit Project ↗", "live-primary-link");
+  titleRow.appendChild(visitLink);
+
+  main.appendChild(titleRow);
 
   const description = document.createElement("p");
-  description.className = "card-description";
-  description.textContent = repo.description || "No description provided.";
-  card.appendChild(description);
-
-  const language = repo.language || "Unknown";
-  const stars = Number.isFinite(repo.stargazers_count) ? repo.stargazers_count : 0;
-  const forks = Number.isFinite(repo.forks_count) ? repo.forks_count : 0;
+  description.className = "live-description";
+  description.textContent = repo?.description || "No description provided.";
+  main.appendChild(description);
 
   const metadata = document.createElement("p");
-  metadata.className = "metadata";
-  metadata.textContent = `${language} · ★ ${stars} · Forks ${forks} · ${formatDate(repo.updated_at)}`;
-  card.appendChild(metadata);
-
-  const topics = Array.isArray(repo.topics) ? repo.topics.slice(0, CONFIG.maxTopicsPerCard) : [];
-  if (topics.length > 0) {
-    const topicWrap = document.createElement("div");
-    topicWrap.className = "topics";
-    topics.forEach((topic) => {
-      const topicTag = document.createElement("span");
-      topicTag.className = "topic";
-      topicTag.textContent = topic;
-      topicWrap.appendChild(topicTag);
-    });
-    card.appendChild(topicWrap);
-  }
+  metadata.className = "live-meta";
+  metadata.textContent = getLiveProjectMetadata(repo);
+  main.appendChild(metadata);
 
   const links = document.createElement("div");
-  links.className = "card-links";
+  links.className = "live-links";
+  links.appendChild(createExternalLink(repo.html_url, "Source ↗"));
+  main.appendChild(links);
 
-  if (options.includeSiteLink && repo.has_pages) {
-    const siteUrl = `${CONFIG.githubPagesOrigin}/${encodeURIComponent(repo.name)}/`;
-    links.appendChild(createExternalLink(siteUrl, "Open Site ↗", true));
+  item.appendChild(main);
+  return item;
+}
+
+function createProjectRow(repo) {
+  const row = document.createElement("article");
+  row.className = "project-row";
+
+  const nameWrap = document.createElement("div");
+  const nameLink = createExternalLink(repo.html_url, repo?.name || "Unnamed project", "project-name");
+  nameWrap.appendChild(nameLink);
+
+  if (repo?.fork) {
+    const forkMark = document.createElement("span");
+    forkMark.className = "project-indicator";
+    forkMark.textContent = "Fork";
+    nameLink.appendChild(forkMark);
   }
 
-  if (!options.includeSiteLink && repo.has_pages) {
-    const siteUrl = `${CONFIG.githubPagesOrigin}/${encodeURIComponent(repo.name)}/`;
-    links.appendChild(createExternalLink(siteUrl, "Live Site ↗", false));
+  if (repo?.archived) {
+    const archivedMark = document.createElement("span");
+    archivedMark.className = "project-indicator";
+    archivedMark.textContent = "Archived";
+    nameLink.appendChild(archivedMark);
   }
 
-  links.appendChild(createExternalLink(repo.html_url, "GitHub ↗", !options.includeSiteLink));
-  card.appendChild(links);
+  row.appendChild(nameWrap);
 
-  return card;
+  const description = document.createElement("p");
+  description.className = "project-description";
+  description.textContent = repo?.description || "No description provided.";
+  row.appendChild(description);
+
+  const meta = document.createElement("p");
+  meta.className = "project-meta";
+  const year = formatYear(repo?.updated_at);
+  const language = getRepositoryLanguage(repo);
+  meta.textContent = language ? `${year} · ${language}` : year;
+  row.appendChild(meta);
+
+  return row;
 }
 
 function renderProfile(profile) {
-  const fallbackName = CONFIG.githubUsername;
-  const fallbackBio = "Open-source projects and live GitHub Pages sites.";
-  const safeName = profile?.name || fallbackName;
-  const safeLogin = profile?.login || CONFIG.githubUsername;
-  const safeBio = profile?.bio || fallbackBio;
-  const safeAvatar = profile?.avatar_url || `https://github.com/${encodeURIComponent(CONFIG.githubUsername)}.png`;
+  const safeName = profile?.name || "Bilal Abiç";
+  const safeBio = profile?.bio || "A collection of public projects, tools and datasets.";
   const safeLink = profile?.html_url || `https://github.com/${encodeURIComponent(CONFIG.githubUsername)}`;
-  const repoCount = Number.isFinite(profile?.public_repos) ? profile.public_repos : state.repositories.length;
 
-  dom.profileAvatar.src = safeAvatar;
-  dom.profileAvatar.alt = `${safeLogin} profile avatar`;
   dom.profileName.textContent = safeName;
-  dom.profileHandle.textContent = `@${safeLogin}`;
   dom.profileBio.textContent = safeBio;
-  dom.profileRepoCount.textContent = `${repoCount} public repositories`;
   dom.profileLink.href = safeLink;
 }
 
-function renderLiveSites(repositories) {
-  dom.liveSitesGrid.textContent = "";
+function renderLiveProjects(repositories) {
+  dom.liveProjectsList.textContent = "";
 
   const liveRepos = sortLiveRepositories(repositories.filter((repo) => repo.has_pages === true));
 
   if (liveRepos.length === 0) {
-    dom.liveSitesEmpty.hidden = false;
+    dom.liveProjectsEmpty.hidden = false;
     return;
   }
 
-  dom.liveSitesEmpty.hidden = true;
-
-  liveRepos.forEach((repo) => {
-    dom.liveSitesGrid.appendChild(createRepositoryCard(repo, { includeSiteLink: true }));
+  dom.liveProjectsEmpty.hidden = true;
+  liveRepos.forEach((repo, index) => {
+    dom.liveProjectsList.appendChild(createLiveProjectEntry(repo, index));
   });
 }
 
@@ -357,7 +369,6 @@ function matchesSearch(repo, query) {
 function matchesFilter(repo, filter) {
   if (filter === "live") return repo.has_pages === true;
   if (filter === "original") return repo.fork === false;
-  if (filter === "forks") return repo.fork === true;
   if (filter === "archived") return repo.archived === true;
   return true;
 }
@@ -367,16 +378,16 @@ function applyRepositoryFilters() {
     matchesFilter(repo, state.filter) && matchesSearch(repo, state.search)
   )));
 
-  dom.repositoriesGrid.textContent = "";
+  dom.projectsList.textContent = "";
 
   if (visible.length === 0) {
-    dom.repositoriesEmpty.hidden = false;
+    dom.projectsEmpty.hidden = false;
     return;
   }
 
-  dom.repositoriesEmpty.hidden = true;
+  dom.projectsEmpty.hidden = true;
   visible.forEach((repo) => {
-    dom.repositoriesGrid.appendChild(createRepositoryCard(repo, { includeSiteLink: false }));
+    dom.projectsList.appendChild(createProjectRow(repo));
   });
 }
 
@@ -471,12 +482,12 @@ function bindControls() {
 function renderData(profile, repositories) {
   state.repositories = sortRepositories(getFilteredRepositories(repositories));
   renderProfile(profile);
-  renderLiveSites(state.repositories);
+  renderLiveProjects(state.repositories);
   applyRepositoryFilters();
 }
 
 async function initializeApp(forceRefresh = false) {
-  showStatus("Loading GitHub projects...");
+  showStatus("Loading projects...");
 
   const cache = getCachedData();
   if (!forceRefresh && cache && isCacheValid(cache)) {
@@ -491,7 +502,7 @@ async function initializeApp(forceRefresh = false) {
     setCachedData({ profile: freshData.profile, repositories: freshData.repositories });
 
     if (freshData.profileErrorType) {
-      showStatus("Profile details are temporarily unavailable. Showing fallback profile data.");
+      showStatus("Profile details are temporarily unavailable. Showing fallback profile text.");
     } else {
       showStatus("");
     }
@@ -504,7 +515,7 @@ async function initializeApp(forceRefresh = false) {
 
     renderProfile(null);
     state.repositories = [];
-    renderLiveSites([]);
+    renderLiveProjects([]);
     applyRepositoryFilters();
 
     const message = deriveErrorMessage(error.type);

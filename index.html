@@ -3,77 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bilalabic — Projects & Live Sites</title>
-  <meta name="description" content="Open-source projects and live GitHub Pages sites by Bilalabic.">
+  <title>Bilal Abiç — Projects & Open Source</title>
+  <meta name="description" content="Projects, datasets and open-source work by Bilal Abiç.">
   <link rel="canonical" href="https://bilalabic.github.io/">
-  <meta property="og:title" content="Bilalabic — Projects & Live Sites">
-  <meta property="og:description" content="Open-source projects and live GitHub Pages sites by Bilalabic.">
+  <meta property="og:title" content="Bilal Abiç — Projects & Open Source">
+  <meta property="og:description" content="Projects, datasets and open-source work by Bilal Abiç.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bilalabic.github.io/">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
+  <main class="page">
     <div class="container">
-      <section class="profile" aria-labelledby="profile-heading">
-        <img id="profileAvatar" class="profile-avatar" src="" alt="Bilalabic profile avatar" width="88" height="88">
-        <div class="profile-content">
-          <h1 id="profileName" class="profile-name" aria-live="polite">Bilalabic</h1>
-          <p id="profileHandle" class="profile-handle">@Bilalabic</p>
-          <p id="profileBio" class="profile-bio">Open-source projects and live GitHub Pages sites.</p>
-          <div class="profile-meta">
-            <span id="profileRepoCount">0 public repositories</span>
-            <a id="profileLink" href="https://github.com/Bilalabic" target="_blank" rel="noopener noreferrer">GitHub Profile ↗</a>
-          </div>
-        </div>
-      </section>
-    </div>
-  </header>
+      <header class="intro" aria-labelledby="profileName">
+        <h1 id="profileName" class="intro-name" aria-live="polite">Bilal Abiç</h1>
+        <p class="intro-tagline">Projects, datasets and open-source work.</p>
+        <p id="profileBio" class="intro-note">A collection of public projects, tools and datasets.</p>
+        <a id="profileLink" class="intro-link" href="https://github.com/Bilalabic" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </header>
 
-  <main>
-    <div class="container">
       <div id="statusRegion" class="status" role="status" aria-live="polite"></div>
 
-      <section class="section" aria-labelledby="live-sites-heading">
+      <section class="section live-projects" aria-labelledby="live-projects-heading">
         <div class="section-head">
-          <h2 id="live-sites-heading">Live Sites</h2>
-          <p>Projects currently published with GitHub Pages.</p>
+          <h2 id="live-projects-heading">Live Projects</h2>
+          <p>Published projects you can open and use.</p>
         </div>
-        <div id="liveSitesGrid" class="card-grid" aria-live="polite"></div>
-        <p id="liveSitesEmpty" class="empty-state" hidden>No live GitHub Pages projects are currently available.</p>
+        <div id="liveProjectsList" class="live-list" aria-live="polite"></div>
+        <p id="liveProjectsEmpty" class="empty-state" hidden>No live projects are currently available.</p>
       </section>
 
-      <section class="section" aria-labelledby="repositories-heading">
+      <section class="section" aria-labelledby="all-projects-heading">
         <div class="section-head">
-          <h2 id="repositories-heading">Repositories</h2>
-          <p>Public repositories on GitHub.</p>
+          <h2 id="all-projects-heading">All Projects</h2>
+          <p>Public projects and open-source work.</p>
         </div>
 
         <div class="controls">
-          <label for="repositorySearch" class="search-label">Search repositories...</label>
-          <input id="repositorySearch" type="search" class="search-input" autocomplete="off" placeholder="Search repositories...">
-          <nav class="filters" aria-label="Repository filters">
+          <label for="repositorySearch" class="search-label">Search projects</label>
+          <input id="repositorySearch" type="search" class="search-input" autocomplete="off" placeholder="Search projects">
+          <nav class="filters" aria-label="Project filters">
             <button type="button" class="filter-button is-active" data-filter="all">All</button>
             <button type="button" class="filter-button" data-filter="live">Live</button>
             <button type="button" class="filter-button" data-filter="original">Original</button>
-            <button type="button" class="filter-button" data-filter="forks">Forks</button>
             <button type="button" class="filter-button" data-filter="archived">Archived</button>
           </nav>
         </div>
 
-        <div id="repositoriesGrid" class="card-grid" aria-live="polite"></div>
-        <p id="repositoriesEmpty" class="empty-state" hidden>No repositories match your search.</p>
+        <div class="project-index" aria-live="polite">
+          <div class="project-index-head" aria-hidden="true">
+            <span>Project</span>
+            <span>Description</span>
+            <span>Updated</span>
+          </div>
+          <div id="projectsList" class="project-list"></div>
+        </div>
+
+        <p id="projectsEmpty" class="empty-state" hidden>No projects match your search.</p>
       </section>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-content">
-      <p>GitHub projects by Bilalabic</p>
+      <p>Projects by Bilal Abiç</p>
       <div class="footer-links">
         <a href="https://github.com/Bilalabic" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-        <a href="https://github.com/Bilalabic/bilalabic.github.io" target="_blank" rel="noopener noreferrer">View source ↗</a>
+        <a href="https://github.com/Bilalabic/bilalabic.github.io" target="_blank" rel="noopener noreferrer">Source ↗</a>
       </div>
     </div>
   </footer>
