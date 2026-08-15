@@ -10,17 +10,32 @@ const CONFIG = {
 
 const STORAGE_KEY = "bilalabic-github-hub-cache";
 
+function pickFirstElement(selectors) {
+  for (const selector of selectors) {
+    if (!selector) {
+      continue;
+    }
+    const element = selector.startsWith("#")
+      ? document.getElementById(selector.slice(1))
+      : document.querySelector(selector);
+    if (element) {
+      return element;
+    }
+  }
+  return null;
+}
+
 const dom = {
-  profileName: document.getElementById("profileName"),
-  profileBio: document.getElementById("profileBio"),
-  profileLink: document.getElementById("profileLink"),
-  liveProjectsList: document.getElementById("liveProjectsList"),
-  liveProjectsEmpty: document.getElementById("liveProjectsEmpty"),
-  projectsList: document.getElementById("projectsList"),
-  projectsEmpty: document.getElementById("projectsEmpty"),
-  repositorySearch: document.getElementById("repositorySearch"),
+  profileName: pickFirstElement(["#profileName"]),
+  profileBio: pickFirstElement(["#profileBio"]),
+  profileLink: pickFirstElement(["#profileLink"]),
+  liveProjectsList: pickFirstElement(["#liveProjectsList", "#liveSitesGrid"]),
+  liveProjectsEmpty: pickFirstElement(["#liveProjectsEmpty", "#liveSitesEmpty"]),
+  projectsList: pickFirstElement(["#projectsList", "#repositoriesGrid"]),
+  projectsEmpty: pickFirstElement(["#projectsEmpty", "#repositoriesEmpty"]),
+  repositorySearch: pickFirstElement(["#repositorySearch"]),
   filterButtons: Array.from(document.querySelectorAll(".filter-button")),
-  statusRegion: document.getElementById("statusRegion")
+  statusRegion: pickFirstElement(["#statusRegion"])
 };
 
 const state = {
@@ -28,6 +43,22 @@ const state = {
   filter: "all",
   search: ""
 };
+
+function getMissingRequiredDomTargets() {
+  const required = [
+    ["profileName", dom.profileName],
+    ["profileBio", dom.profileBio],
+    ["profileLink", dom.profileLink],
+    ["liveProjectsList", dom.liveProjectsList],
+    ["liveProjectsEmpty", dom.liveProjectsEmpty],
+    ["projectsList", dom.projectsList],
+    ["projectsEmpty", dom.projectsEmpty],
+    ["repositorySearch", dom.repositorySearch],
+    ["statusRegion", dom.statusRegion]
+  ];
+
+  return required.filter(([, element]) => !element).map(([name]) => name);
+}
 
 function normalizeName(value) {
   return String(value || "").toLowerCase();
@@ -327,12 +358,22 @@ function renderProfile(profile) {
   const safeBio = profile?.bio || "A collection of public projects, tools and datasets.";
   const safeLink = profile?.html_url || `https://github.com/${encodeURIComponent(CONFIG.githubUsername)}`;
 
-  dom.profileName.textContent = safeName;
-  dom.profileBio.textContent = safeBio;
-  dom.profileLink.href = safeLink;
+  if (dom.profileName) {
+    dom.profileName.textContent = safeName;
+  }
+  if (dom.profileBio) {
+    dom.profileBio.textContent = safeBio;
+  }
+  if (dom.profileLink) {
+    dom.profileLink.href = safeLink;
+  }
 }
 
 function renderLiveProjects(repositories) {
+  if (!dom.liveProjectsList || !dom.liveProjectsEmpty) {
+    return;
+  }
+
   dom.liveProjectsList.textContent = "";
 
   const liveRepos = sortLiveRepositories(repositories.filter((repo) => repo.has_pages === true));
@@ -374,6 +415,10 @@ function matchesFilter(repo, filter) {
 }
 
 function applyRepositoryFilters() {
+  if (!dom.projectsList || !dom.projectsEmpty) {
+    return;
+  }
+
   const visible = sortRepositories(state.repositories.filter((repo) => (
     matchesFilter(repo, state.filter) && matchesSearch(repo, state.search)
   )));
@@ -400,6 +445,10 @@ function setFilter(nextFilter) {
 }
 
 function showStatus(message, type = "info", retryHandler = null) {
+  if (!dom.statusRegion) {
+    return;
+  }
+
   dom.statusRegion.className = type === "error" ? "status error" : "status";
   dom.statusRegion.textContent = "";
 
@@ -467,10 +516,12 @@ async function loadFromGitHub() {
 }
 
 function bindControls() {
-  dom.repositorySearch.addEventListener("input", (event) => {
-    state.search = event.target.value || "";
-    applyRepositoryFilters();
-  });
+  if (dom.repositorySearch) {
+    dom.repositorySearch.addEventListener("input", (event) => {
+      state.search = event.target.value || "";
+      applyRepositoryFilters();
+    });
+  }
 
   dom.filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -487,6 +538,14 @@ function renderData(profile, repositories) {
 }
 
 async function initializeApp(forceRefresh = false) {
+  const missingDomTargets = getMissingRequiredDomTargets();
+  if (missingDomTargets.length > 0) {
+    const message = `Missing required DOM targets: ${missingDomTargets.join(", ")}`;
+    console.error(message);
+    showStatus("The page layout is out of sync with the script. Please refresh.", "error");
+    return;
+  }
+
   showStatus("Loading projects...");
 
   const cache = getCachedData();
